@@ -25,7 +25,12 @@ pip install transformer
 ```bash
 bash run_demo_image_conditioned.sh
 ```
-![Detect Result](./outputs/owlvit_box_2.jpg)
+
+## Generate Submission
+- Use the command below to generate submission
+```bash
+python gen_submissions.py --shelf_dir PATH/TO/product_detection_from_packshots/shelf_images/  --query_dir PATH/TO/product_detection_from_packshots/product_images
+
 
 ## Reference
 Please give applause for [OWL-ViT on HuggingFace](https://huggingface.co/spaces/adirik/OWL-ViT)

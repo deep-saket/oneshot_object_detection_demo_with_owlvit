@@ -5,10 +5,6 @@ if __name__ == '__main__':
 
     parser.add_argument("--shelf_dir", "-i", type=str, required=True, help="path to image file")
     parser.add_argument("--query_dir", "-qi", type=str, default="", required=True, help="path to query image file")
-    
-    parser.add_argument(
-        "--output_dir", "-o", type=str, default="outputs", required=True, help="output directory"
-    )
     parser.add_argument('--owlvit_model', help='select model', default="owlvit-base-patch32", choices=["owlvit-base-patch32", "owlvit-base-patch16", "owlvit-large-patch14"])
     parser.add_argument("--box_threshold", type=float, default=0.0, help="box threshold")
     parser.add_argument("--nms_threshold", type=float, default=0.0, help="nms threshold")
@@ -18,13 +14,11 @@ if __name__ == '__main__':
     # load arguments
     shelf_dir = args.shelf_dir
     query_dir = args.query_dir
-    output_dir = args.output_dir
     box_threshold = args.box_threshold
     nms_threshold = args.nms_threshold
 
 
     # create dir to store outputs
-    os.makedirs(output_dir, exist_ok=True)
 
     # load OWL-ViT model
     model, processor = load_owlvit(checkpoint_path=args.owlvit_model, device=args.device)
