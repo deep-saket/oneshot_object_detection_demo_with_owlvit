@@ -29,7 +29,8 @@ bash run_demo_image_conditioned.sh
 ## Generate Submission
 - Use the command below to generate submission
 ```bash
-python gen_submissions.py --shelf_dir PATH/TO/product_detection_from_packshots/shelf_images/  --query_dir PATH/TO/product_detection_from_packshots/product_images
+python gen_submissions.py --shelf_dir PATH/TO/product_detection_from_packshots/shelf_images/  --query_dir PATH/TO/product_detection_from_packshots/product_images --device cpu:0 --owlvit_model owlvit-base-patch16 --box_threshold 0.66 
+```
 
 
 ## Reference

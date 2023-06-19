@@ -23,48 +23,42 @@ if __name__ == '__main__':
     # load OWL-ViT model
     model, processor = load_owlvit(checkpoint_path=args.owlvit_model, device=args.device)
 
-    for query_image_name in os.listdir(query_dir):
-        query_image_path = os.path.join(query_dir, query_image_name)
-        query_image_class = query_image_name[2:-4]
+    with open('solution_1.txt', 'w') as f:
+        for query_image_name in os.listdir(query_dir):
+            query_image_path = os.path.join(query_dir, query_image_name)
+            query_image_class = query_image_name[2:-4]
 
-        for shelf_image_name in os.listdir(shelf_dir):
-            shelf_image_path = os.path.join(shelf_dir, shelf_image_name)            
-            shelf_image_class = shelf_image_name[2:-4]
+            for shelf_image_name in os.listdir(shelf_dir):
+                shelf_image_path = os.path.join(shelf_dir, shelf_image_name)            
+                shelf_image_class = shelf_image_name[2:-4]
 
-            print(query_image_path, shelf_image_path)
+                print(query_image_path, shelf_image_path)
 
-            # load image
-            image = Image.open(shelf_image_path)    
+                # load image
+                image = Image.open(shelf_image_path)    
 
-            # run object detection model
-            with torch.no_grad():
-                query_image = Image.open(query_image_path).convert('RGB')
-                inputs = processor(query_images=query_image, images=image, return_tensors="pt").to(args.device)
-                outputs = model.image_guided_detection(**inputs)
-    
-            # Target image sizes (height, width) to rescale box predictions [batch_size, 2]
-            target_sizes = torch.Tensor([image.size[::-1]])
-            # Convert outputs (bounding boxes and class logits) to COCO API
-            results = processor.post_process_image_guided_detection(outputs=outputs, threshold=box_threshold, nms_threshold=nms_threshold, target_sizes=target_sizes.to(args.device))
-            scores = torch.sigmoid(outputs.logits)
-            topk_scores, topk_idxs = torch.topk(scores, k=1, dim=1)
-            
-            i = 0  # Retrieve predictions for the first image
-            
-            boxes, scores = results[i]["boxes"], results[i]["scores"]
-            
+                # run object detection model
+                with torch.no_grad():
+                    query_image = Image.open(query_image_path).convert('RGB')
+                    inputs = processor(query_images=query_image, images=image, return_tensors="pt").to(args.device)
+                    outputs = model.image_guided_detection(**inputs)
+        
+                # Target image sizes (height, width) to rescale box predictions [batch_size, 2]
+                target_sizes = torch.Tensor([image.size[::-1]])
+                # Convert outputs (bounding boxes and class logits) to COCO API
+                results = processor.post_process_image_guided_detection(outputs=outputs, threshold=box_threshold, nms_threshold=nms_threshold, target_sizes=target_sizes.to(args.device))
+                scores = torch.sigmoid(outputs.logits)
+                topk_scores, topk_idxs = torch.topk(scores, k=1, dim=1)
+                
+                i = 0  # Retrieve predictions for the first image
+                
+                boxes, scores = results[i]["boxes"], results[i]["scores"]
+                
 
-            # Print detected objects and rescaled box coordinates
-            for box, score in zip(boxes, scores):
-                box = [round(i, 2) for i in box.tolist()]
-                print(f"Detected object with confidence {round(score.item(), 3)} at location {box}")
+                # Print detected objects and rescaled box coordinates
+                for box, score in zip(boxes, scores):
+                    box = [round(i, 2) for i in box.tolist()]
+                    print(f"Detected object with confidence {round(score.item(), 3)} at location {box}")
 
-            boxes = boxes.cpu().detach().numpy()
-            normalized_boxes = copy.deepcopy(boxes)
-            
-            # # visualize pred
-            size = image.size   
-
-            with open('a.txt', 'w') as f:
-                for box in normalized_boxes:
                     f.write(f'{query_image_class} {shelf_image_class} {int(box[0])} {int(box[1])} {int(box[2])} {int(box[3])}\n')
+                    
